@@ -1,0 +1,101 @@
+# hotkey to start the vgs script
+hotkey_start: v
+# hotkey to cancel the vgs script/restore other controls at any time
+hotkey_cancel: ESCAPE
+
+
+# groups need a `hotkey` and either another `groups` or `phrases` attribute
+#
+# names should not contain spaces and only letters and underscores
+
+groups:
+  - name:    Positioning
+    hotkey:  p
+    phrases:
+      - hotkey: c
+        id: 0
+        name: Care
+      - hotkey: s
+        id: 4
+        name: Stun
+      - hotkey: g
+        id: 12 
+        name: Go
+
+
+#############
+# REFERENCE #
+#############
+#
+# chatwheel_say 0 "Okay"
+# chatwheel_say 1 "Care"
+# chatwheel_say 2 "Get Back"
+# chatwheel_say 3 "Need Wards"
+# chatwheel_say 4 "Stun"
+# chatwheel_say 5 "Help"
+# chatwheel_say 6 "Push"
+# chatwheel_say 7 "Well played"
+# chatwheel_say 8 "Missing"
+# chatwheel_say 9 "Missing top"
+# chatwheel_say 10 "Missing mid"
+# chatwheel_say 11 "Missing bottom"
+# chatwheel_say 12 "Go!"
+# chatwheel_say 13 "Initiate!"
+# chatwheel_say 14 "Follow me"
+# chatwheel_say 15 "Group up"
+# chatwheel_say 16 "Spread out"
+# chatwheel_say 17 "Split farm"
+# chatwheel_say 18 "Attack now!"
+# chatwheel_say 19 "Be right back"
+# chatwheel_say 20 "Dive!"
+# chatwheel_say 21 "On my way"
+# chatwheel_say 22 "Get ready"
+# chatwheel_say 23 "Bait"
+# chatwheel_say 24 "Heal"
+# chatwheel_say 25 "Mana"
+# chatwheel_say 26 "Out of mana"
+# chatwheel_say 27 "Cooldown"
+# chatwheel_say 28 "Ulti ready"
+# chatwheel_say 29 "Returned"
+# chatwheel_say 30 "All miss"
+# chatwheel_say 31 "Incoming"
+# chatwheel_say 32 "Invis enemy"
+# chatwheel_say 33 "Enemy has rune"
+# chatwheel_say 34 "Split push"
+# chatwheel_say 35 "Coming to gank"
+# chatwheel_say 36 "Request gank"
+# chatwheel_say 37 "Under tower"
+# chatwheel_say 38 "Deny tower"
+# chatwheel_say 39 "Buy courier"
+# chatwheel_say 40 "Upgrade courier"
+# chatwheel_say 41 "We need detection"
+# chatwheel_say 42 "They have detection"
+# chatwheel_say 43 "Buy TP"
+# chatwheel_say 44 "Re-use courier"
+# chatwheel_say 45 "Deward"
+# chatwheel_say 46 "Building Mek"
+# chatwheel_say 47 "Building Pipe"
+# chatwheel_say 48 "Stack and pull"
+# chatwheel_say 49 "Pull creeps"
+# chatwheel_say 50 "Pulling creeps"
+# chatwheel_say 51 "Stack neutrals"
+# chatwheel_say 52 "Jungling"
+# chatwheel_say 53 "Roshan"
+# chatwheel_say 54 "Affirmative"
+# chatwheel_say 55 "Wait"
+# chatwheel_say 56 "Pause"
+# chatwheel_say 57 "Current Time"
+# chatwheel_say 58 "Check runes"
+# chatwheel_say 59 "Smoke gank!"
+# chatwheel_say 60 "Good luck"
+# chatwheel_say 61 "Nice"
+# chatwheel_say 62 "Thanks"
+# chatwheel_say 63 "Sorry"
+# chatwheel_say 64 "Don't give up"
+# chatwheel_say 65 "That just happened"
+# chatwheel_say 66 "Game is hard"
+# chatwheel_say 67 "New meta"
+# chatwheel_say 68 "My bad"
+# chatwheel_say 69 "Regret"
+# chatwheel_say 70 "Relax"
+
