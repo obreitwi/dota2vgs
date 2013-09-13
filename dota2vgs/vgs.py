@@ -139,23 +139,50 @@ class Composer(object):
         """
             Set up the starting alias.
         """
+        self.assure_no_duplicate_hotkeys(dct)
+
         alias = self.add_alias(self.get_aname_group(dct["name"]))
 
-        if "phrases" in dct:
-            for phrase in dct["phrases"]:
-                phrase_name = self.setup_phrase(phrase["name"], phrase["id"])
-                hotkey_name = self.get_aname_current(phrase["hotkey"])
+        for phrase in dct.get("phrases", []):
+            phrase_name = self.setup_phrase(phrase["name"], phrase["id"])
+            hotkey_name = self.get_aname_current(phrase["hotkey"])
 
-                alias.add(self.get_cmd_alias(hotkey_name, phrase_name))
+            alias.add(self.get_cmd_alias(hotkey_name, phrase_name))
 
-        if "groups" in dct:
-            for group in dct["groups"]:
-                self.setup_aliases_group(group)
+        for group in dct.get("groups", []):
+            self.setup_aliases_group(group)
 
-                group_name = self.get_aname_group(group["name"])
-                hotkey_name = self.get_aname_current(group["hotkey"])
+            group_name = self.get_aname_group(group["name"])
+            hotkey_name = self.get_aname_current(group["hotkey"])
 
-                alias.add(self.get_cmd_alias(hotkey_name, group_name))
+            alias.add(self.get_cmd_alias(hotkey_name, group_name))
+
+    def assure_no_duplicate_hotkeys(self, dct):
+        hotkeys = self.get_concurrent_hotkeys(dct)
+        set_hotkeys = set(hotkeys)
+
+        if len(hotkeys) != len(set_hotkeys):
+            duplicate_hotkeys = []
+            for k in set_hotkeys:
+                if hotkeys.count(k) > 1:
+                    duplicate_hotkeys.append(k)
+            log.warn("Group {} contains duplicate hotkeys for: {}".format(
+                dct["name"], ", ".join(duplicate_hotkeys)))
+
+    def get_concurrent_hotkeys(self, dct):
+        """
+            Returns all hotkeys used by group.
+
+            NOTE: That it is a list and may have duplicates etc.
+        """
+        hotkeys = []
+        recursive_elements = ["phrases", "groups"]
+
+        for elem in recursive_elements:
+            for item in dct.get(elem, []):
+                hotkeys.append(item["hotkey"])
+
+        return hotkeys
 
     def setup_phrase(self, name, id):
         """
@@ -177,9 +204,9 @@ class Composer(object):
 
     def write_bindings(self, file):
         for k in self.used_keys:
-            file.write("bind \"{key}\" \"{function}\"\n".format(
-                key=k,
-                function=self.get_aname_current(k)))
+            b = Bind(k)
+            b.add(self.get_aname_current(k))
+            file.write(b.get()+"\n")
 
     def write_aliases(self, file):
         for a in self.aliases.values():

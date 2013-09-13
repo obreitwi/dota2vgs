@@ -35,9 +35,8 @@ class TestRestoreAlias(unittest.TestCase):
 
         comp = dota2vgs.Composer(["autoexec.cfg", "config.cfg"], "layout.yaml")
 
-        pprint(comp.existing_binds)
-
-        pprint(comp.used_keys)
+        # pprint(comp.existing_binds)
+        # pprint(comp.used_keys)
         for k,v in comp.aliases.items():
             print(v.get())
 
