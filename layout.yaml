@@ -16,6 +16,27 @@ groups:
         name: Care
         hotkey: c
 
+      - id: 5
+        name: Help
+        hotkey: h
+
+      - id: 54
+        name: Affirmative
+        hotkey: a
+
+      - id: 55
+        name: Wait
+        hotkey: w
+
+      - id: 56
+        name: Pause
+        hotkey: p
+
+      - id: 57
+        name: Current_Time
+        hotkey: t
+
+
   - name:    Aggressive
     hotkey:  a
     phrases:
@@ -23,12 +44,166 @@ groups:
         name: Stun
         hotkey: s
 
-  - name:    Strategic
+      - id: 12
+        name: Go
+        hotkey: g
+
+      - id: 14
+        name: Follow_me
+        hotkey: f
+
+      - id: 18
+        name: Attack_now
+        hotkey: a
+
+      - id: 20
+        name: Dive
+        hotkey: d
+
+
+  - name:    Self
     hotkey:  s
+    phrases:
+      - id: 21
+        name: On_my_way
+        hotkey: w
+
+      - id: 19
+        name: Be_right_back
+        hotkey: b
+
+      - id: 24
+        name: Heal
+        hotkey: h
+
+      - id: 25
+        name: Mana
+        hotkey: m
+
+      - id: 26
+        name: Out_of_mana
+        hotkey: q
+
+      - id: 27
+        name: Cooldown
+        hotkey: c
+
+      - id: 28
+        name: Ulti_ready
+        hotkey: u
+
+      - id: 29
+        name: Returned
+        hotkey: r
+
+      - id: 50
+        name: Pulling_creeps
+        hotkey: p
+
+
+  - name:    Team
+    hotkey:  t
+    phrases:
+      - id: 22
+        name: Get_ready
+        hotkey: g
+
+      - id: 23
+        name: Bait
+        hotkey: b
+
+      - id: 44
+        name: Re-use_courier
+        hotkey: c
+
+      - id: 45
+        name: Deward
+        hotkey: d
+
+      - id: 58
+        name: Check_runes
+        hotkey: r
+
+
+  - name:    Enemy
+    hotkey:  e
+    phrases:
+      - id: 31
+        name: Incoming
+        hotkey: i
+
+      - id: 32
+        name: Invis_enemy
+        hotkey: v
+
+      - id: 33
+        name: Enemy_has_rune
+        hotkey: r
+
+      - id: 42
+        name: They_have_detection
+        hotkey: d
+
+
+  - name:    Items
+    hotkey:  i
+    phrases:
+      - id: 39
+        name: Buy_courier
+        hotkey: b
+
+      - id: 40
+        name: Upgrade_courier
+        hotkey: u
+
+      - id: 41
+        name: We_need_detection
+        hotkey: d
+
+      - id: 43
+        name: Buy_TP
+        hotkey: t
+
+      - id: 46
+        name: Building_Mek
+        hotkey: m
+
+      - id: 47
+        name: Building_Pipe
+        hotkey: p
+
+
+  - name:    GlobalStrategy
+    hotkey:  g
     phrases:
       - id: 3
         name: Need_Wards
         hotkey: w
+
+      - id: 6
+        name: Push
+        hotkey: p
+
+      - id: 13
+        name: Initiate
+        hotkey: i
+
+      - id: 15
+        name: Group_up
+        hotkey: g
+
+      - id: 17
+        name: Split_farm
+        hotkey: f
+
+      - id: 34
+        name: Split_push
+        hotkey: s
+
+      - id: 59
+        name: Smoke_gank
+        hotkey: m
+
 
   - name:    Defensive
     hotkey:  d
@@ -37,279 +212,163 @@ groups:
         name: Get_Back
         hotkey: b
 
-  - name:    Response
-    hotkey:  r
+      - id: 16
+        name: Spread_out
+        hotkey: s
+
+
+  - name:    Fluff
+    hotkey:  f
     phrases:
+      - id: 7
+        name: Well_played
+        hotkey: w
+
+      - id: 60
+        name: Good_luck
+        hotkey: l
+
+      - id: 61
+        name: Nice
+        hotkey: n
+
+      - id: 62
+        name: Thanks
+        hotkey: t
+
+      - id: 63
+        name: Sorry
+        hotkey: s
+
       - id: 0
         name: Okay
         hotkey: o
 
-
-      
-      
-      - id: 5
-        name: Help
-        hotkey: h
-      
-      - id: 6
-        name: Push
-        hotkey: p
-      
-      - id: 7
-        name: Well_played
-        hotkey: w
-      
-      - id: 8
-        name: Missing
-        hotkey: m
-      
-      - id: 9
-        name: Missing_top
-        hotkey: m
-      
-      - id: 10
-        name: Missing_mid
-        hotkey: m
-      
-      - id: 11
-        name: Missing_bottom
-        hotkey: m
-      
-      - id: 12
-        name: Go
-        hotkey: g
-      
-      - id: 13
-        name: Initiate
-        hotkey: i
-      
-      - id: 14
-        name: Follow_me
-        hotkey: f
-      
-      - id: 15
-        name: Group_up
-        hotkey: g
-      
-      - id: 16
-        name: Spread_out
-        hotkey: s
-      
-      - id: 17
-        name: Split_farm
-        hotkey: s
-      
-      - id: 18
-        name: Attack_now
-        hotkey: a
-      
-      - id: 19
-        name: Be_right_back
-        hotkey: b
-      
-      - id: 20
-        name: Dive
-        hotkey: d
-      
-      - id: 21
-        name: On_my_way
-        hotkey: o
-      
-      - id: 22
-        name: Get_ready
-        hotkey: g
-      
-      - id: 23
-        name: Bait
-        hotkey: b
-      
-      - id: 24
-        name: Heal
-        hotkey: h
-      
-      - id: 25
-        name: Mana
-        hotkey: m
-      
-      - id: 26
-        name: Out_of_mana
-        hotkey: o
-      
-      - id: 27
-        name: Cooldown
-        hotkey: c
-      
-      - id: 28
-        name: Ulti_ready
-        hotkey: u
-      
-      - id: 29
-        name: Returned
-        hotkey: r
-      
-      - id: 30
-        name: All_miss
-        hotkey: a
-      
-      - id: 31
-        name: Incoming
-        hotkey: i
-      
-      - id: 32
-        name: Invis_enemy
-        hotkey: i
-      
-      - id: 33
-        name: Enemy_has_rune
-        hotkey: e
-      
-      - id: 34
-        name: Split_push
-        hotkey: s
-      
-      - id: 35
-        name: Coming_to_gank
-        hotkey: c
-      
-      - id: 36
-        name: Request_gank
-        hotkey: r
-      
-      - id: 37
-        name: Under_tower
-        hotkey: u
-      
-      - id: 38
-        name: Deny_tower
-        hotkey: d
-      
-      - id: 39
-        name: Buy_courier
-        hotkey: b
-      
-      - id: 40
-        name: Upgrade_courier
-        hotkey: u
-      
-      - id: 41
-        name: We_need_detection
-        hotkey: w
-      
-      - id: 42
-        name: They_have_detection
-        hotkey: t
-      
-      - id: 43
-        name: Buy_TP
-        hotkey: b
-      
-      - id: 44
-        name: Re-use_courier
-        hotkey: r
-      
-      - id: 45
-        name: Deward
-        hotkey: d
-      
-      - id: 46
-        name: Building_Mek
-        hotkey: b
-      
-      - id: 47
-        name: Building_Pipe
-        hotkey: b
-      
-      - id: 48
-        name: Stack_and_pull
-        hotkey: s
-      
-      - id: 49
-        name: Pull_creeps
-        hotkey: p
-      
-      - id: 50
-        name: Pulling_creeps
-        hotkey: p
-      
-      - id: 51
-        name: Stack_neutrals
-        hotkey: s
-      
-      - id: 52
-        name: Jungling
-        hotkey: j
-      
-      - id: 53
-        name: Roshan
-        hotkey: r
-      
-      - id: 54
-        name: Affirmative
-        hotkey: a
-      
-      - id: 55
-        name: Wait
-        hotkey: w
-      
-      - id: 56
-        name: Pause
-        hotkey: p
-      
-      - id: 57
-        name: Current_Time
-        hotkey: c
-      
-      - id: 58
-        name: Check_runes
-        hotkey: c
-      
-      - id: 59
-        name: Smoke_gank
-        hotkey: s
-      
-      - id: 60
-        name: Good_luck
-        hotkey: g
-      
-      - id: 61
-        name: Nice
-        hotkey: n
-      
-      - id: 62
-        name: Thanks
-        hotkey: t
-      
-      - id: 63
-        name: Sorry
-        hotkey: s
-      
       - id: 64
         name: Dont_give_up
         hotkey: d
-      
+
       - id: 65
         name: That_just_happened
-        hotkey: t
-      
+        hotkey: h
+
       - id: 66
         name: Game_is_hard
         hotkey: g
-      
+
       - id: 67
         name: New_meta
-        hotkey: n
-      
+        hotkey: m
+
       - id: 68
         name: My_bad
-        hotkey: m
-      
+        hotkey: b
+
       - id: 69
         name: Regret
-        hotkey: r
-      
+        hotkey: e
+
       - id: 70
         name: Relax
         hotkey: r
+
+
+  - name:    Where_did_they_go
+    hotkey:  w
+    phrases:
+      - id: 8
+        name: Missing
+        hotkey: w # -> vww for quick miss calls
+
+      - id: 9
+        name: Missing_top
+        hotkey: t
+
+      - id: 10
+        name: Missing_mid
+        hotkey: g # half way between top and bottom
+
+      - id: 11
+        name: Missing_bottom
+        hotkey: b
+
+      - id: 30
+        name: All_miss
+        hotkey: a
+
+
+  - name:    Lane
+    hotkey:  l
+    phrases:
+      - id: 36
+        name: Request_gank
+        hotkey: r
+
+      - id: 37
+        name: Under_tower
+        hotkey: t
+
+      - id: 38
+        name: Deny_tower
+        hotkey: d
+
+
+  - name:    Neutrals
+    hotkey:  n
+    phrases:
+      - id: 48
+        name: Stack_and_pull
+        hotkey: a
+
+      - id: 49
+        name: Pull_creeps
+        hotkey: p
+
+      - id: 51
+        name: Stack_neutrals
+        hotkey: s
+
+      - id: 52
+        name: Jungling
+        hotkey: j
+
+      - id: 53
+        name: Roshan
+        hotkey: r
+
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
 
 
 #############
