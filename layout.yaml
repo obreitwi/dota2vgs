@@ -113,7 +113,7 @@ groups:
         hotkey: b
 
       - id: 44
-        name: Re-use_courier
+        name: Reuse_courier
         hotkey: c
 
       - id: 45
@@ -624,7 +624,7 @@ groups:
         # hotkey: b
       
       # - id: 44
-        # name: Re-use_courier
+        # name: Reuse_courier
         # hotkey: r
       
       # - id: 45

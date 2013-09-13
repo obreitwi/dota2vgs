@@ -38,15 +38,20 @@ class BindParser(object):
     def __init__(self, filename):
         log.info("Parsing: {0}".format(filename))
 
-        self.binds = {}
+        self.content = {}
         with open(filename, "r") as f:
             for l in f.readlines():
                 match = self.matcher.search(l)
 
                 if match is None:
                     continue
-                self.binds[match.groupdict()["key"]] = match.groupdict()["function"]
+                self.content[match.groupdict()["key"]] = match.groupdict()["function"]
 
     def get(self):
-        return self.binds
+        return self.content
+
+
+class AliasParser(BindParser):
+    matcher = re.compile(
+                    r"^alias\s+\"(?P<key>[^\"]+)\"\s\"(?P<function>[^\"]+)\"")
 

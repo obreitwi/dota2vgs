@@ -21,6 +21,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+__all__ = ["Composer"]
+
 from .logcfg import log
 from .cfg_parser import BindParser
 from .commands import Alias, Bind
@@ -33,11 +35,11 @@ class Composer(object):
     """
 
     # prefix for aliases
-    prefix = "dota2vgs_"
-    prefix_original = "original_"
-    prefix_current = "current_"
-    prefix_group = "group_"
-    prefix_phrase = "phrase_"
+    prefix = "vgs_"
+    prefix_original = "ori_"
+    prefix_current = "cur_"
+    prefix_group = "grp_"
+    prefix_phrase = "phr_"
 
     def __init__(self, cfg_filenames, layout_filename, output_filename=None):
         """
@@ -129,6 +131,7 @@ class Composer(object):
             Sets up the alias resetting all used keys to their original state.
         """
         restore = self.add_alias("restore")
+        self.restore_alias_name = restore.name
         for k in self.used_keys:
             restore.add("alias {current} {original}".format(
                 current=self.get_aname_current(k),
@@ -192,14 +195,14 @@ class Composer(object):
         """
         alias = self.add_alias(self.get_aname_phrase(name))
         alias.add("chatwheel_say {}".format(id))
-        alias.add(self.prefix+"restore")
+        alias.add(self.restore_alias_name)
         return alias.name
 
     def write_script_file(self, filename):
         f = open(filename, "w")
         self.write_aliases(f)
         self.write_bindings(f)
-        f.write(self.prefix+"restore")
+        f.write(self.restore_alias_name + "\n")
         f.close()
 
     def write_bindings(self, file):

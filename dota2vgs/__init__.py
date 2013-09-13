@@ -24,3 +24,5 @@
 from .logcfg import log
 
 from .vgs import *
+from .cfg_parser import *
+
