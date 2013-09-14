@@ -29,4 +29,5 @@ if __name__ == "__main__":
             cfg_filenames=["config.cfg", "autoexec.cfg"],
             lst_filenames=["dotakeys_personal.lst"],
             layout_filename="layout.yaml",
-            output_filename="vgs.cfg")
+            output_filename="vgs.cfg",
+            ignore_keys=["z"])

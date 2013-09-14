@@ -29,6 +29,7 @@ from .lst_parser import LST_Hotkey_Parser
 from .commands import Alias, Bind
 from .misc import load_data
 
+import string
 
 class Composer(object):
     """
@@ -43,7 +44,7 @@ class Composer(object):
     prefix_phrase = "phr_"
 
     def __init__(self, cfg_filenames, lst_filenames, layout_filename,
-            output_filename=None):
+            output_filename=None, ignore_keys=None):
         """
             `cfg_filenames` is a list of filenames from which to read the
             original configuration that is to be preserved.
@@ -57,11 +58,15 @@ class Composer(object):
         self.existing_binds = {}
         for cfg_fn in cfg_filenames:
             b = BindParser(cfg_fn)
-            self.existing_binds.update(b.get())
+            for k,v in b.get().items():
+                self.existing_binds[k.lower()] = v
 
         with open(layout_filename, "r") as f:
             self.layout = load_data(f)
         self._determine_used_keys()
+
+        if ignore_keys is not None:
+            self.used_keys -= set(ignore_keys)
 
         # see if any of the used keys have a mapping in the lst file (dota 2
         # options)
@@ -112,7 +117,11 @@ class Composer(object):
 
 
     def _determine_used_keys(self):
-        self.used_keys = set()
+        # self.used_keys = set()
+
+        # for now just add all ascii keys
+        self.used_keys = set(string.lowercase)
+
         self.used_keys.add(self.layout["hotkey_start"])
         self.used_keys.add(self.layout["hotkey_cancel"])
 
@@ -158,6 +167,9 @@ class Composer(object):
         self.assure_no_duplicate_hotkeys(dct)
 
         alias = self.add_alias(self.get_aname_group(dct["name"]))
+        alias.add(self.get_cmd_alias(
+            self.get_aname_current(self.layout["hotkey_cancel"]),
+            self.restore_alias_name))
 
         for phrase in dct.get("phrases", []):
             phrase_name = self.setup_phrase(phrase["name"], phrase["id"])
