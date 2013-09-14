@@ -25,6 +25,7 @@ __all__ = ["Composer"]
 
 from .logcfg import log
 from .cfg_parser import BindParser
+from .lst_parser import LST_Hotkey_Parser
 from .commands import Alias, Bind
 from .misc import load_data
 
@@ -41,7 +42,8 @@ class Composer(object):
     prefix_group = "grp_"
     prefix_phrase = "phr_"
 
-    def __init__(self, cfg_filenames, layout_filename, output_filename=None):
+    def __init__(self, cfg_filenames, lst_filenames, layout_filename,
+            output_filename=None):
         """
             `cfg_filenames` is a list of filenames from which to read the
             original configuration that is to be preserved.
@@ -59,10 +61,21 @@ class Composer(object):
 
         with open(layout_filename, "r") as f:
             self.layout = load_data(f)
+        self._determine_used_keys()
+
+        # see if any of the used keys have a mapping in the lst file (dota 2
+        # options)
+        for lst_file in lst_filenames:
+            h =  LST_Hotkey_Parser(lst_file)
+            mapping = h.get_hotkey_functions(self.used_keys)
+            self.existing_binds.update(mapping)
+
+        log.info("Please go to the Dota 2 options menu and delete the bindings "
+                "to the following keys: {}".format(self.used_keys))
+
         # adjust the existing binding for the start hotkey only
         self.existing_binds[self.layout["hotkey_start"]] =\
                 self.get_aname_group("start")
-        self._determine_used_keys()
         self._setup_aliases_existing_binds()
         self._setup_aliases_restore()
         self.layout["name"] = "start"

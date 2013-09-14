@@ -92,10 +92,6 @@ groups:
         name: Ulti_ready
         hotkey: u
 
-      - id: 29
-        name: Returned
-        hotkey: r
-
       - id: 50
         name: Pulling_creeps
         hotkey: p
@@ -246,7 +242,7 @@ groups:
 
       - id: 64
         name: Dont_give_up
-        hotkey: d
+        hotkey: u
 
       - id: 65
         name: That_just_happened
@@ -295,6 +291,10 @@ groups:
       - id: 30
         name: All_miss
         hotkey: a
+
+      - id: 29
+        name: Returned
+        hotkey: r
 
 
   - name:    Lane

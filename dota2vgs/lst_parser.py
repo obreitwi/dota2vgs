@@ -1,0 +1,125 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
+# Copyright (c) 2013 Oliver Breitwieser
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+
+"""
+    Parses the lst files containing dota key bindings.
+"""
+
+import re
+from .logcfg import log
+
+
+class ParentDict(dict):
+    """
+        A dict that knows about its parent.
+    """
+
+    def __init__(self, parent, *args, **kwargs):
+        self.parent = parent
+        super(ParentDict, self).__init__(*args, **kwargs)
+
+
+class LST_Parser(object):
+
+    matchers = {
+        "keyval"  :
+            re.compile("^\s*\"(?P<key>[^\"]+)\"\s*\"(?P<value>[^\"]+)\"\s*$"),
+        "keyname" :
+            re.compile("^\s*\"(?P<key>[^\"]+)\"\s*$"),
+        "dict-begin" :
+            re.compile("^\s*{\s*$"),
+        "dict-end" :
+            re.compile("^\s*}\s*$"),
+    }
+
+    def __init__(self, filename):
+        f = open(filename, "r")
+
+        self.content = {}
+
+        current = self.content
+        next_name = None
+
+        for line in f.readlines():
+            line = line.strip()
+
+            # try to find a key-value pair
+            keyval = self.matchers["keyval"].search(line)
+            if keyval is not None:
+                keyval = keyval.groupdict()
+                current[keyval["key"]] = keyval["value"]
+                continue
+
+            keyname = self.matchers["keyname"].search(line)
+            if keyname is not None:
+                next_name = keyname.groupdict()["key"]
+                continue
+
+            begin = self.matchers["dict-begin"].search(line)
+            if begin is not None:
+                current[next_name] = ParentDict(current)
+                current = current[next_name]
+                continue
+
+            end = self.matchers["dict-end"].search(line)
+            if end is not None:
+                current = current.parent
+        f.close()
+
+    def get(self):
+        return self.content
+
+
+class LST_Hotkey_Parser(LST_Parser):
+
+    ignore_prefixes = ["Heroes", "Shop", "Spectator"]
+
+    def get_hotkey_functions(self, hotkeys):
+        """
+            Return a dict containing the functions for the supplied hotkeys.
+        """
+
+        mappings = {}
+        read_hotkeys = self.content["KeyBindings"]["Keys"]
+
+        for k,v in read_hotkeys.items():
+            # Ignore spectator keys etc
+            if any((k.startswith(pref) for pref in self.ignore_prefixes)):
+                continue
+
+            # also ignore if there is no keybinding or a modifier in place
+            if "Key" not in v or "Modifier" in v:
+                continue
+
+            key = v["Key"]
+            function = v["Action"]
+
+            # single keys are always lowercase in cfg -> keep it consistent
+            if len(key) == 1:
+                key = key.lower()
+
+            if key in hotkeys:
+                mappings[key] = function
+
+        return mappings
+
