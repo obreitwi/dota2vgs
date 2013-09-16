@@ -26,7 +26,7 @@ __all__ = ["Composer"]
 from .logcfg import log
 from .cfg_parser import BindParser
 from .lst_parser import LST_Hotkey_Parser
-from .commands import Alias, Bind
+from .commands import Bind, StateAwareAlias as Alias
 from .misc import load_data
 
 import string
@@ -37,7 +37,7 @@ class Composer(object):
     """
 
     # prefix for aliases
-    prefix = "vgs_"
+    prefix = "+vgs_"
     prefix_original = "ori_"
     prefix_current = "cur_"
     prefix_group = "grp_"
@@ -148,6 +148,14 @@ class Composer(object):
             alias = self.add_alias(self.get_aname_original(k))
             alias.add(self.existing_binds[k])
 
+    def add_clear_aliases(self, alias, hotkeys):
+        """
+            Adds aliases that disable all aliases for the keys in hotkeys.
+        """
+        for h in hotkeys:
+            alias.add("alias {}".format(self.get_aname_current(h)))
+
+
     def _setup_aliases_restore(self):
         """
             Sets up the alias resetting all used keys to their original state.
@@ -170,6 +178,13 @@ class Composer(object):
         alias.add(self.get_cmd_alias(
             self.get_aname_current(self.layout["hotkey_cancel"]),
             self.restore_alias_name))
+
+        # clear all other keys to prevent accidentatl keypresses
+        clear_hotkeys = self.used_keys - set(self.get_concurrent_hotkeys(dct))
+        clear_hotkeys -= set([self.layout["hotkey_cancel"],
+            self.layout["hotkey_start"]])
+
+        self.add_clear_aliases(alias, clear_hotkeys)
 
         for phrase in dct.get("phrases", []):
             phrase_name = self.setup_phrase(phrase["name"], phrase["id"])

@@ -147,3 +147,52 @@ class Alias(ScriptCommand):
         return chunk_indices
 
 
+class StateAwareAlias(Alias):
+    """
+        Checks if its content contains a toggle and returns two aliases.
+
+        NOTE: The binds need to take into account the statefulness of the alias.
+    """
+
+    token_state_on = "+"
+    token_state_off = "-"
+
+    def get(self, force_stateful=True):
+        """
+            `force_stateful` allows to always have stateful aliases
+        """
+        if not force_stateful and not self.contains_state_at_all():
+            return super(StateAwareAlias, self).get()
+
+        # we contain state, apply all non-state toggles in plus
+        # all state toggles go in both
+
+        # for that we create two aliases on and off
+        alias_on = None
+        alias_off = None
+        if self.name.startswith(self.token_state_on):
+            alias_on = Alias(self.name)
+            alias_off = Alias(self.name.replace(self.token_state_on,
+                self.token_state_off))
+        else:
+            alias_on = Alias(self.token_state_on+self.name)
+            alias_off = Alias(self.token_state_off+self.name)
+
+        for c in self.content:
+            alias_on.add(c)
+            if self.contains_state(c):
+                alias_off.add(c.replace(self.token_state_on,
+                    self.token_state_off))
+
+        return "\n".join([alias_on.get(), alias_off.get()])
+
+
+
+    def contains_state(self, entry):
+        return self.token_state_on in entry
+
+    def contains_state_at_all(self):
+        return any(self.containts_state(entry) for entry in self.content)
+
+
+
