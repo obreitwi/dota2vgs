@@ -26,7 +26,7 @@ __all__ = ["Composer"]
 from .logcfg import log
 from .cfg_parser import BindParser
 from .lst_parser import LST_Hotkey_Parser
-from .commands import Bind, StateAwareAlias as Alias
+from .commands import Bind, Alias, StatefulAlias
 from .misc import load_data
 
 import string
@@ -37,7 +37,7 @@ class Composer(object):
     """
 
     # prefix for aliases
-    prefix = "+vgs_"
+    prefix = "vgs_"
     prefix_original = "ori_"
     prefix_current = "cur_"
     prefix_group = "grp_"
@@ -64,6 +64,7 @@ class Composer(object):
         with open(layout_filename, "r") as f:
             self.layout = load_data(f)
         self._determine_used_keys()
+        self.key_stateful = set([])
 
         if ignore_keys is not None:
             self.used_keys -= set(ignore_keys)
@@ -74,9 +75,6 @@ class Composer(object):
             h =  LST_Hotkey_Parser(lst_file)
             mapping = h.get_hotkey_functions(self.used_keys)
             self.existing_binds.update(mapping)
-
-        log.info("Please go to the Dota 2 options menu and delete the bindings "
-                "to the following keys: {}".format(self.used_keys))
 
         # adjust the existing binding for the start hotkey only
         self.existing_binds[self.layout["hotkey_start"]] =\
@@ -89,8 +87,12 @@ class Composer(object):
         if output_filename is not None:
             self.write_script_file(output_filename)
 
-    def add_alias(self, name):
-        new_alias = Alias(self.get_alias_name(name))
+        log.info("Please go to the Dota 2 options menu and delete the bindings "
+                "to the following keys: {}".format(self.used_keys))
+
+
+    def add_alias(self, name, type_=Alias):
+        new_alias = type_(self.get_alias_name(name))
         self.aliases[name] = new_alias
         return new_alias
 
@@ -98,16 +100,39 @@ class Composer(object):
         return "alias {} {}".format(a_from, a_to)
 
     def get_alias_name(self, name):
-        if name.startswith(self.prefix):
-            return name
+        # make sure name contains prefix
+        if not name.startswith(self.prefix):
+            name = self.prefix + name
+
+        return name
+
+    def get_aname_current(self, key, off_state=False):
+        """
+            `off_state` = True will return the off_state alias name for a
+            stateful alias.
+        """
+        if self.is_key_stateful(key):
+            if not off_state:
+                prefix = StatefulAlias.token_state_on
+            else:
+                prefix = StatefulAlias.token_state_off
         else:
-            return self.prefix + name
+            prefix = ""
+        return prefix + self.get_alias_name(self.prefix_current + key)
 
-    def get_aname_current(self, name):
-        return self.get_alias_name(self.prefix_current + name)
-
-    def get_aname_original(self, name):
-        return self.get_alias_name(self.prefix_original + name)
+    def get_aname_original(self, key, off_state=False):
+        """
+            `off_state` = True will return the off_state alias name for a
+            stateful alias.
+        """
+        if self.is_key_stateful(key):
+            if not off_state:
+                prefix = StatefulAlias.token_state_on
+            else:
+                prefix = StatefulAlias.token_state_off
+        else:
+            prefix = ""
+        return prefix + self.get_alias_name(self.prefix_original + key)
 
     def get_aname_group(self, name):
         return self.get_alias_name(self.prefix_group + name)
@@ -115,6 +140,8 @@ class Composer(object):
     def get_aname_phrase(self, name):
         return self.get_alias_name(self.prefix_phrase + name)
 
+    def is_key_stateful(self, key):
+        return key in self.key_stateful
 
     def _determine_used_keys(self):
         # self.used_keys = set()
@@ -145,8 +172,20 @@ class Composer(object):
             Sets up aliases containing the original key function.
         """
         for k in self.used_keys & set(self.existing_binds.keys()):
-            alias = self.add_alias(self.get_aname_original(k))
-            alias.add(self.existing_binds[k])
+            existing_bind = self.existing_binds[k]
+
+            alias_type = Alias
+
+            if StatefulAlias.contains_state(existing_bind):
+                # the bind contains state, we need to account for that
+                alias_type = StatefulAlias
+
+            alias = self.add_alias(self.get_aname_original(k), type_=alias_type)
+
+            if StatefulAlias.contains_state(existing_bind):
+                self.key_stateful.add(k)
+
+            alias.add(existing_bind)
 
     def add_clear_aliases(self, alias, hotkeys):
         """
@@ -154,6 +193,9 @@ class Composer(object):
         """
         for h in hotkeys:
             alias.add("alias {}".format(self.get_aname_current(h)))
+            if self.is_key_stateful(h):
+                alias.add("alias {}".format(self.get_aname_current(h,
+                    off_state=True)))
 
 
     def _setup_aliases_restore(self):
@@ -167,6 +209,11 @@ class Composer(object):
                 current=self.get_aname_current(k),
                 original=self.get_aname_original(k),
                 ))
+            if self.is_key_stateful(k):
+                restore.add("alias {current} {original}".format(
+                    current=self.get_aname_current(k, off_state=True),
+                    original=self.get_aname_original(k, off_state=True),
+                    ))
 
     def setup_aliases_group(self, dct):
         """

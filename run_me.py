@@ -24,10 +24,11 @@
 import dota2vgs
 import glob
 
+# TODO: docopt interface
+
 if __name__ == "__main__":
     dota2vgs.Composer(
             cfg_filenames=["config.cfg", "autoexec.cfg"],
             lst_filenames=["dotakeys_personal.lst"],
             layout_filename="layout.yaml",
-            output_filename="vgs.cfg",
-            ignore_keys=["z"])
+            output_filename="vgs.cfg")

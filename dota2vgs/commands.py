@@ -147,36 +147,28 @@ class Alias(ScriptCommand):
         return chunk_indices
 
 
-class StateAwareAlias(Alias):
+class StatefulAlias(Alias):
     """
-        Checks if its content contains a toggle and returns two aliases.
+        Stateful Alias
 
-        NOTE: The binds need to take into account the statefulness of the alias.
+        Automatically creates two aliases for on and off.
     """
 
     token_state_on = "+"
     token_state_off = "-"
+    token_cmd_split = ";"
 
-    def get(self, force_stateful=True):
-        """
-            `force_stateful` allows to always have stateful aliases
-        """
-        if not force_stateful and not self.contains_state_at_all():
-            return super(StateAwareAlias, self).get()
-
+    def get(self):
         # we contain state, apply all non-state toggles in plus
         # all state toggles go in both
 
         # for that we create two aliases on and off
-        alias_on = None
-        alias_off = None
-        if self.name.startswith(self.token_state_on):
-            alias_on = Alias(self.name)
-            alias_off = Alias(self.name.replace(self.token_state_on,
-                self.token_state_off))
-        else:
-            alias_on = Alias(self.token_state_on+self.name)
-            alias_off = Alias(self.token_state_off+self.name)
+        alias_on_name = self.name
+        alias_off_name = alias_on_name.replace(self.token_state_on,
+                self.token_state_off)
+
+        alias_on = Alias(alias_on_name)
+        alias_off = Alias(alias_off_name)
 
         for c in self.content:
             alias_on.add(c)
@@ -186,13 +178,22 @@ class StateAwareAlias(Alias):
 
         return "\n".join([alias_on.get(), alias_off.get()])
 
+    @property
+    def name(self):
+        orig_name = super(StatefulAlias, self).name
+        return self.token_state_on + orig_name
 
+    @classmethod
+    def contains_state(cls, entry):
+        return any(cmd.strip().startswith(cls.token_state_on)
+                    for cmd in entry.split(cls.token_cmd_split))
 
-    def contains_state(self, entry):
-        return self.token_state_on in entry
+    @classmethod
+    def check_content_for_state(cls, content):
+        return any(cls.containts_state(entry) for entry in content)
 
     def contains_state_at_all(self):
-        return any(self.containts_state(entry) for entry in self.content)
+        return self.check_content_for_state(self.content)
 
 
 
