@@ -290,6 +290,7 @@ class Composer(object):
         self.write_aliases(f)
         self.write_bindings(f)
         f.write(self.restore_alias_name + "\n")
+        f.write("echo \"VGS successfully loaded!\"\n")
         f.close()
 
     def write_bindings(self, file):
