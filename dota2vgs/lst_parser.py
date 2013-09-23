@@ -52,9 +52,8 @@ class LST_Parser(object):
             re.compile("^\s*}\s*$"),
     }
 
-    def __init__(self, filename):
-        f = open(filename, "r")
-
+    def __init__(self, f):
+        f.seek(0)
         self.content = {}
 
         current = self.content
@@ -84,7 +83,6 @@ class LST_Parser(object):
             end = self.matchers["dict-end"].search(line)
             if end is not None:
                 current = current.parent
-        f.close()
 
     def get(self):
         return self.content

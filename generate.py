@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # encoding: utf-8
 
 # Copyright (c) 2013 Oliver Breitwieser
@@ -65,6 +65,7 @@ __version__ = "0.1.0"
 import dota2vgs
 import glob
 import os.path as osp
+import itertools
 
 try:
     from docopt import docopt
@@ -74,10 +75,24 @@ except ImportError:
     from docopt import docopt
 
 
+def open_files(filenames, mode="r"):
+    return [open(fn, mode=mode) for fn in filenames]
+
+
 if __name__ == "__main__":
     args = docopt(__doc__, argv=sys.argv[1:], version=__version__)
+
+    cfg_files   = open_files(args["--cfg-file"], mode="r")
+    lst_files   = open_files(args["--lst-file"], mode="r")
+    layout_file = open(args["--layout-file"], mode="r")
+    output_file = open(args["--output-file"], mode="w")
+
     dota2vgs.Composer(
-            cfg_filenames=args["--cfg-file"],
-            lst_filenames=args["--lst-file"],
-            layout_filename=args["--layout-file"],
-            output_filename=args["--output-file"])
+        cfg_files=cfg_files,
+        lst_files=lst_files,
+        layout_file=layout_file,
+        output_file=output_file)
+
+    for f in itertools.chain(cfg_files, lst_files, [layout_file, output_file]):
+        f.close()
+

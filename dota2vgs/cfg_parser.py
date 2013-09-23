@@ -35,17 +35,21 @@ class BindParser(object):
     matcher = re.compile(
                     r"^bind\s+\"(?P<key>[^\"]+)\"\s\"(?P<function>[^\"]+)\"")
 
-    def __init__(self, filename):
-        log.info("Parsing: {0}".format(filename))
+    def __init__(self, f):
+        try:
+            log.info("Parsing: {0}".format(f.name))
+        except AttributeError:
+            pass
+
+        f.seek(0)
 
         self.content = {}
-        with open(filename, "r") as f:
-            for l in f.readlines():
-                match = self.matcher.search(l)
+        for l in f.readlines():
+            match = self.matcher.search(l)
 
-                if match is None:
-                    continue
-                self.content[match.groupdict()["key"]] = match.groupdict()["function"]
+            if match is None:
+                continue
+            self.content[match.groupdict()["key"]] = match.groupdict()["function"]
 
     def get(self):
         return self.content
