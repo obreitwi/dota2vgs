@@ -43,6 +43,13 @@ class Composer(object):
     prefix_group = "grp_"
     prefix_phrase = "phr_"
 
+    designator_groups = "groups"
+    designator_cmds = "phrases"
+
+    @property
+    def recursive_elements(self):
+        return [self.designator_groups, self.designator_cmds]
+
     def __init__(self, cfg_files, lst_files, layout_file,
             output_file=None, ignore_keys=None):
         """
@@ -76,7 +83,7 @@ class Composer(object):
             self.existing_binds.update(mapping)
 
         # adjust the existing binding for the start hotkey only
-        self.existing_binds[self.layout["hotkey_start"]] =\
+        self.existing_binds[self.layout["hotkey"]] =\
                 self.get_aname_group("start")
         self._setup_aliases_existing_binds()
         self._setup_aliases_restore()
@@ -148,13 +155,11 @@ class Composer(object):
         # for now just add all ascii keys
         self.used_keys = set(string.lowercase)
 
-        self.used_keys.add(self.layout["hotkey_start"])
+        self.used_keys.add(self.layout["hotkey"])
         self.used_keys.add(self.layout["hotkey_cancel"])
 
         queue = []
-        queue.extend(self.layout["groups"])
-
-        recursive_elements = ["phrases", "groups"]
+        queue.extend(self.layout[self.designator_groups])
 
         while len(queue) > 0:
             item = queue.pop()
@@ -162,7 +167,7 @@ class Composer(object):
             if "hotkey" in item:
                 self.used_keys.add(item["hotkey"])
 
-            for k in recursive_elements:
+            for k in self.recursive_elements:
                 if k in item:
                     queue.extend(item[k])
 
@@ -228,17 +233,17 @@ class Composer(object):
         # clear all other keys to prevent accidentatl keypresses
         clear_hotkeys = self.used_keys - set(self.get_concurrent_hotkeys(dct))
         clear_hotkeys -= set([self.layout["hotkey_cancel"],
-            self.layout["hotkey_start"]])
+            self.layout["hotkey"]])
 
         self.add_clear_aliases(alias, clear_hotkeys)
 
-        for phrase in dct.get("phrases", []):
+        for phrase in dct.get(self.designator_cmds, []):
             phrase_name = self.setup_phrase(phrase["name"], phrase["id"])
             hotkey_name = self.get_aname_current(phrase["hotkey"])
 
             alias.add(self.get_cmd_alias(hotkey_name, phrase_name))
 
-        for group in dct.get("groups", []):
+        for group in dct.get(self.designator_groups, []):
             self.setup_aliases_group(group)
 
             group_name = self.get_aname_group(group["name"])
@@ -265,9 +270,8 @@ class Composer(object):
             NOTE: That it is a list and may have duplicates etc.
         """
         hotkeys = []
-        recursive_elements = ["phrases", "groups"]
 
-        for elem in recursive_elements:
+        for elem in self.recursive_elements:
             for item in dct.get(elem, []):
                 hotkeys.append(item["hotkey"])
 

@@ -1,5 +1,5 @@
 # hotkey to start the vgs script
-hotkey_start: v
+hotkey: v
 # hotkey to cancel the vgs script/restore other controls at any time
 hotkey_cancel: v
 

@@ -29,6 +29,13 @@ __doc__ =\
     Usage:
         {prgm}  [-c <filename>]... [-l <filename>]...
                 [-y <filename>] [-o <filename>]
+        {prgm}  sheet [-y <filename>] [-s <filename>]
+
+    Modes:
+        Default :   Generate the vgs file.
+
+        sheet :     Make a cheat sheet of all the commands present in the layout
+                    file.
 
     Options:
         -c --cfg-file <filename>
@@ -51,6 +58,10 @@ __doc__ =\
         -o --output-file <filename>
             Specify output filename.
             [default: vgs.cfg]
+
+        -s --sheet-file <filename>
+            When generating a cheat sheet, the filename to be used.
+            [default: sheet.txt]
 
         --usage
             Print usage only.
@@ -82,17 +93,26 @@ def open_files(filenames, mode="r"):
 if __name__ == "__main__":
     args = docopt(__doc__, argv=sys.argv[1:], version=__version__)
 
-    cfg_files   = open_files(args["--cfg-file"], mode="r")
-    lst_files   = open_files(args["--lst-file"], mode="r")
     layout_file = open(args["--layout-file"], mode="r")
-    output_file = open(args["--output-file"], mode="w")
 
-    dota2vgs.Composer(
-        cfg_files=cfg_files,
-        lst_files=lst_files,
-        layout_file=layout_file,
-        output_file=output_file)
+    if args["sheet"]:
+        sheet_file = open(args["--sheet-file"], "w")
+        dota2vgs.SheetMaker(layout_file, sheet_file)
 
-    for f in itertools.chain(cfg_files, lst_files, [layout_file, output_file]):
-        f.close()
+        layout_file.close()
+        sheet_file.close()
+
+    else:
+        cfg_files   = open_files(args["--cfg-file"], mode="r")
+        lst_files   = open_files(args["--lst-file"], mode="r")
+        output_file = open(args["--output-file"], mode="w")
+        dota2vgs.Composer(
+            cfg_files=cfg_files,
+            lst_files=lst_files,
+            layout_file=layout_file,
+            output_file=output_file)
+
+        for f in itertools.chain(cfg_files, lst_files,
+                [layout_file, output_file]):
+            f.close()
 
