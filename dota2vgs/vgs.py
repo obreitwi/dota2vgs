@@ -51,20 +51,21 @@ class Composer(object):
         return [self.designator_groups, self.designator_cmds]
 
     def __init__(self, cfg_files, lst_files, layout_file,
-            output_file=None, ignore_keys=None):
+            output_file=None, ignore_keys=None, silent=False):
         """
             `cfg_files` is a list of filenames from which to read the
             original configuration that is to be preserved.
 
             `layout_file` yaml file with layout infomration of the VGS. 
         """
+        self.silent = silent
         # aliases to be included in the final script
         self.aliases = {}
 
         # read existing binds
         self.existing_binds = {}
         for cfg_file in cfg_files:
-            b = BindParser(cfg_file)
+            b = BindParser(cfg_file, silent=self.silent)
             for k,v in b.get().items():
                 self.existing_binds[k.lower()] = v
 
@@ -78,7 +79,7 @@ class Composer(object):
         # see if any of the used keys have a mapping in the lst file (dota 2
         # options)
         for lst_file in lst_files:
-            h =  LST_Hotkey_Parser(lst_file)
+            h =  LST_Hotkey_Parser(lst_file, silent=self.silent)
             mapping = h.get_hotkey_functions(self.used_keys)
             self.existing_binds.update(mapping)
 
@@ -93,8 +94,9 @@ class Composer(object):
         if output_file is not None:
             self.write_script_file(output_file)
 
-        log.info("Please go to the Dota 2 options menu and delete the bindings "
-                "to the following keys: {}".format(self.used_keys))
+        if not self.silent:
+            log.info("Please go to the Dota 2 options menu and delete the bindings "
+                    "to the following keys: {}".format(self.used_keys))
 
 
     def add_alias(self, name, type_=Alias):

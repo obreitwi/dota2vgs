@@ -35,9 +35,11 @@ class BindParser(object):
     matcher = re.compile(
                     r"^bind\s+\"(?P<key>[^\"]+)\"\s\"(?P<function>[^\"]+)\"")
 
-    def __init__(self, f):
+    def __init__(self, f, silent=False):
+        self.silent = silent
         try:
-            log.info("Parsing: {0}".format(f.name))
+            if not self.silent:
+                log.info("Parsing: {0}".format(f.name))
         except AttributeError:
             pass
 

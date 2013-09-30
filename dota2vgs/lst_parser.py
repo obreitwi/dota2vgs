@@ -52,7 +52,9 @@ class LST_Parser(object):
             re.compile("^\s*}\s*$"),
     }
 
-    def __init__(self, f):
+    def __init__(self, f, silent=False):
+        self.silent = silent
+
         f.seek(0)
         self.content = {}
 
