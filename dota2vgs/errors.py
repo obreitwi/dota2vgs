@@ -21,11 +21,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from .logcfg import log
 
-from .vgs import *
-from .cfg_parser import *
-from .lst_parser import *
-from .format import *
-from . import errors
+# Collection of all errors used.
+
+
+from .lst_parser import LST_Error
 

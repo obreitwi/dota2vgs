@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python:
 # encoding: utf-8
 
 # Copyright (c) 2013 Oliver Breitwieser
@@ -29,6 +29,10 @@ import re
 from .logcfg import log
 
 
+class LST_Error(Exception):
+    pass
+
+
 class ParentDict(dict):
     """
         A dict that knows about its parent.
@@ -56,6 +60,7 @@ class LST_Parser(object):
         self.silent = silent
 
         f.seek(0)
+        self.fname = f.filename
         self.content = {}
 
         current = self.content
@@ -100,26 +105,29 @@ class LST_Hotkey_Parser(LST_Parser):
         """
 
         mappings = {}
-        read_hotkeys = self.content["KeyBindings"]["Keys"]
+        try:
+            read_hotkeys = self.content["KeyBindings"]["Keys"]
 
-        for k,v in read_hotkeys.items():
-            # Ignore spectator keys etc
-            if any((k.startswith(pref) for pref in self.ignore_prefixes)):
-                continue
+            for k,v in read_hotkeys.items():
+                # Ignore spectator keys etc
+                if any((k.startswith(pref) for pref in self.ignore_prefixes)):
+                    continue
 
-            # also ignore if there is no keybinding or a modifier in place
-            if "Key" not in v or "Modifier" in v:
-                continue
+                # also ignore if there is no keybinding or a modifier in place
+                if "Key" not in v or "Modifier" in v:
+                    continue
 
-            key = v["Key"]
-            function = v["Action"]
+                key = v["Key"]
+                function = v["Action"]
 
-            # single keys are always lowercase in cfg -> keep it consistent
-            if len(key) == 1:
-                key = key.lower()
+                # single keys are always lowercase in cfg -> keep it consistent
+                if len(key) == 1:
+                    key = key.lower()
 
-            if key in hotkeys:
-                mappings[key] = function
+                if key in hotkeys:
+                    mappings[key] = function
+        except KeyError:
+            raise LST_Error("No hotkey information found in specified .lst file!")
 
         return mappings
 
