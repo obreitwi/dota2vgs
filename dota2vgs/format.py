@@ -42,11 +42,14 @@ class SheetMaker(object):
     str_sep_hotkey = " "
     str_space = " "
 
-    def __init__(self, layout_file, output_file):
+    def __init__(self, layout_file, output_file,
+            sort_alphabetically=True):
         layout = load_data(layout_file)
         self.output_file = output_file
+        self.sort_alphabetically = sort_alphabetically
 
         self.handle_group(layout, tuple())
+
 
     def handle_group(self, grp, parents):
         # only write named groups
@@ -60,12 +63,17 @@ class SheetMaker(object):
             self.handle_cmds(grp[self.designator_cmds], parents)
 
         if self.designator_groups in grp:
-            for g in grp[self.designator_groups]:
+            grps = grp[self.designator_groups]
+            if self.sort_alphabetically:
+                grps = sorted(grps, key=lambda x: x["hotkey"])
+            for g in grps:
                 self.handle_group(g, parents)
 
         self.write_to_file("")
 
     def handle_cmds(self, cmds, parents):
+        if self.sort_alphabetically:
+            cmds = sorted(cmds, key=lambda x: x["hotkey"])
         for cmd in cmds:
             fmt_cmd = self.format_cmd(cmd, parents)
             self.write_to_file(fmt_cmd)
