@@ -60,7 +60,6 @@ class LST_Parser(object):
         self.silent = silent
 
         f.seek(0)
-        self.fname = f.filename
         self.content = {}
 
         current = self.content
