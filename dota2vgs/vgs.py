@@ -30,11 +30,19 @@ from .commands import Bind, Alias, StatefulAlias
 from .misc import load_data
 
 import string
+import itertools as it
+
+class ParseError(Exception):
+    pass
 
 class Composer(object):
     """
-       Composes and write the VGS system. 
+       Composes and write the VGS system.
     """
+    # allowed letters for names
+    desired_letters = string.ascii_letters\
+            + "_" + string.digits
+
 
     # prefix for aliases
     prefix = "vgs_"
@@ -56,7 +64,7 @@ class Composer(object):
             `cfg_files` is a list of filenames from which to read the
             original configuration that is to be preserved.
 
-            `layout_file` yaml file with layout infomration of the VGS. 
+            `layout_file` yaml file with layout infomration of the VGS.
         """
         self.silent = silent
         # aliases to be included in the final script
@@ -70,6 +78,7 @@ class Composer(object):
                 self.existing_binds[k.lower()] = v
 
         self.layout = load_data(layout_file)
+        self.check_layout_names()
         self._determine_used_keys()
         self.key_stateful = set([])
 
@@ -305,4 +314,17 @@ class Composer(object):
     def write_aliases(self, file):
         for a in self.aliases.values():
             file.write(a.get()+"\n")
+
+    def check_layout_names(self, grp=None):
+        if grp is None:
+            grp = self.layout
+
+        name = grp.get("name", "")
+        if any((l not in self.desired_letters for l in name)):
+            raise ParseError("Illegal character in {}.".format(name))
+
+        for g in it.chain(
+                grp.get(self.designator_groups, []),
+                grp.get(self.designator_cmds, [])):
+            self.check_layout_names(g)
 

@@ -7,7 +7,6 @@ hotkey_cancel: v
 # groups need a `hotkey` and either another `groups` or `phrases` attribute
 #
 # names should not contain spaces and only letters and underscores
-
 groups:
   - name:    Quick
     hotkey:  q
@@ -149,7 +148,7 @@ groups:
         hotkey: d
 
 
-  - name:    Items_Dinge
+  - name:    Devices_aka_Items
     hotkey:  d
     phrases:
       - id: 3

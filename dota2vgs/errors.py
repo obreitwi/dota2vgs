@@ -26,4 +26,5 @@
 
 
 from .lst_parser import LST_Error
+from .vgs import ParseError
 
