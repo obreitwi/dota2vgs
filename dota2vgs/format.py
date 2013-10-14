@@ -48,8 +48,17 @@ class SheetMaker(object):
         self.output_file = output_file
         self.sort_alphabetically = sort_alphabetically
 
+        self.write_prelude(layout)
         self.handle_group(layout, tuple())
 
+
+    def write_prelude(self, layout):
+        self.write_to_file("Hotkey (start): {}".format(layout["hotkey"]))
+        self.write_to_file("Hotkey (stop):  {}".format(layout["hotkey_cancel"]))
+
+        self.write_to_file("")
+        self.write_to_file("Hotkey      Phrase")
+        self.write_to_file("^^^^^^^^^^^^^^^^^^")
 
     def handle_group(self, grp, parents):
         # only write named groups
@@ -97,6 +106,6 @@ class SheetMaker(object):
         return fmt_cmd
 
     def write_to_file(self, line):
-        log.info(line)
+        # log.info(line)
         self.output_file.write(line + "\n")
 
