@@ -59,7 +59,9 @@ class Composer(object):
         return [self.designator_groups, self.designator_cmds]
 
     def __init__(self, cfg_files, lst_files, layout_file,
-            output_file=None, ignore_keys=None, silent=False):
+            output_file=None, ignore_keys=None, silent=False,
+            lineending="\r\n" # windows style by default
+            ):
         """
             `cfg_files` is a list of filenames from which to read the
             original configuration that is to be preserved.
@@ -69,6 +71,7 @@ class Composer(object):
         self.silent = silent
         # aliases to be included in the final script
         self.aliases = {}
+        self.LE = lineending
 
         # read existing binds
         self.existing_binds = {}
@@ -302,18 +305,18 @@ class Composer(object):
     def write_script_file(self, f):
         self.write_aliases(f)
         self.write_bindings(f)
-        f.write(self.restore_alias_name + "\n")
-        f.write("echo \"VGS successfully loaded!\"\n")
+        f.write(self.restore_alias_name + self.LE)
+        f.write("echo \"VGS successfully loaded!" + self.LE)
 
     def write_bindings(self, file):
         for k in self.used_keys:
             b = Bind(k)
             b.add(self.get_aname_current(k))
-            file.write(b.get()+"\n")
+            file.write(b.get() + self.LE)
 
     def write_aliases(self, file):
         for a in self.aliases.values():
-            file.write(a.get()+"\n")
+            file.write(a.get() + self.LE)
 
     def check_layout_names(self, grp=None):
         if grp is None:
