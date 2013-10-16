@@ -180,7 +180,7 @@ groups:
         hotkey: p
 
 
-  - name:    GlobalStrategy
+  - name:    Global_Strategy
     hotkey:  g
     phrases:
       - id: 6
