@@ -103,6 +103,8 @@ class Composer(object):
         self.layout["name"] = "start"
         self.setup_aliases_group(self.layout)
 
+        self.additional_commands()
+
         if output_file is not None:
             self.write_script_file(output_file)
 
@@ -330,4 +332,21 @@ class Composer(object):
                 grp.get(self.designator_groups, []),
                 grp.get(self.designator_cmds, [])):
             self.check_layout_names(g)
+
+    def additional_commands(self):
+        """
+            Other commands outside of the regular rebinding
+        """
+        if self.layout.get("indicate_vgs_mode_via_minimap", False):
+            self.set_indicator()
+
+    def set_indicator(self):
+        start = self.aliases[self.get_aname_group("start")]
+        start.add("dota_minimap_hero_size {}".format(
+            self.layout.get("minimap_hero_size_vgs_mode", 1200)))
+
+        restore = self.aliases["restore"]
+        restore.add("dota_minimap_hero_size {}".format(
+            self.layout.get("minimap_hero_size_regular", 600)))
+
 

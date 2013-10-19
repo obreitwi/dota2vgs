@@ -3,6 +3,12 @@ hotkey: v
 # hotkey to cancel the vgs script/restore other controls at any time
 hotkey_cancel: v
 
+# have the hero icons on the minimap indicate whether we are in vgs mode or not
+# thx to reddit user Chudooder for suggesting this
+indicate_vgs_mode_via_minimap: True # set to false or omit to disable
+minimap_hero_size_vgs_mode: 1200
+minimap_hero_size_regular: 600    # this is the default value
+                                  # I personally use 800
 
 # groups need a `hotkey` and either another `groups` or `phrases` attribute
 #
