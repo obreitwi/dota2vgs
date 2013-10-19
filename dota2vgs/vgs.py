@@ -112,7 +112,7 @@ class Composer(object):
 
 
     def add_alias(self, name, type_=Alias):
-        new_alias = type_(self.get_alias_name(name))
+        new_alias = type_(self.get_alias_name(name), lineending=self.LE)
         self.aliases[name] = new_alias
         return new_alias
 

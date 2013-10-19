@@ -39,7 +39,8 @@ class ScriptCommand(object):
     separator = ";"
     to_escape = [ "\"" ]
 
-    def __init__(self, key):
+    def __init__(self, key, lineending="\r\n"):
+        self.LE = lineending
         self.key = key
         self.content = []
 
@@ -108,7 +109,7 @@ class Alias(ScriptCommand):
             if i < len(chunk_idx)-2:
                 chunks[-1].add(self.get_rep_name(i+1))
 
-        return "\n".join(c.get() for c in chunks)
+        return self.LE.join(c.get() for c in chunks)
 
 
     def get_rep_name(self, idx):
@@ -176,7 +177,7 @@ class StatefulAlias(Alias):
                 alias_off.add(c.replace(self.token_state_on,
                     self.token_state_off))
 
-        return "\n".join([alias_on.get(), alias_off.get()])
+        return self.LE.join([alias_on.get(), alias_off.get()])
 
     @property
     def name(self):

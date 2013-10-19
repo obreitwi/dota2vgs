@@ -43,13 +43,16 @@ class SheetMaker(object):
     str_space = " "
 
     def __init__(self, layout_file, output_file,
-            sort_alphabetically=True):
+            sort_alphabetically=True, lineending="\r\n"):
+        self.LE = lineending
+
         layout = load_data(layout_file)
         self.output_file = output_file
         self.sort_alphabetically = sort_alphabetically
 
         self.write_prelude(layout)
         self.handle_group(layout, tuple())
+
 
 
     def write_prelude(self, layout):
@@ -107,5 +110,5 @@ class SheetMaker(object):
 
     def write_to_file(self, line):
         # log.info(line)
-        self.output_file.write(line + "\n")
+        self.output_file.write(line + self.LE)
 
