@@ -96,8 +96,6 @@ class LST_Parser(object):
 
 class LST_Hotkey_Parser(LST_Parser):
 
-    ignore_prefixes = ["Heroes", "Shop", "Spectator"]
-
     def get_hotkey_functions(self, hotkeys):
         """
             Return a dict containing the functions for the supplied hotkeys.
@@ -108,12 +106,11 @@ class LST_Hotkey_Parser(LST_Parser):
             read_hotkeys = self.content["KeyBindings"]["Keys"]
 
             for k,v in read_hotkeys.items():
-                # Ignore spectator keys etc
-                if any((k.startswith(pref) for pref in self.ignore_prefixes)):
-                    continue
-
                 # also ignore if there is no keybinding or a modifier in place
                 if "Key" not in v or "Modifier" in v:
+                    continue
+
+                if not self.check_validity(k, v):
                     continue
 
                 key = v["Key"]
@@ -123,9 +120,6 @@ class LST_Hotkey_Parser(LST_Parser):
                 if len(key) == 1:
                     key = key.lower()
 
-                if not self.check_validity(v):
-                    continue
-
                 if key in hotkeys:
                     mappings[key] = function
         except KeyError:
@@ -134,13 +128,22 @@ class LST_Hotkey_Parser(LST_Parser):
         return mappings
 
 
-    def check_validity(self, v):
+    def check_validity(self, k, v):
         """
             Determine if the entry `v` is valid to be included in the functions.
 
             Needed for some legacy stuff.
         """
-        if v["Action"].split()[0] == "dota_ability_execute":
+        ignore_prefixes = ["Heroes", "Spectator"]
+
+        if any((k.startswith(pref) for pref in ignore_prefixes)):
+            return False
+
+        elif k.startswith("Shop"):
+            # we ignore all shop keys except for the toggle
+            return v["Name"] == "ShopToggle"
+
+        elif v["Action"].split()[0] == "dota_ability_execute":
             # we need to make sure to only cound PrimaryAction -> the rest is
             # legacy
             if v.get("Panel", "") == "#DOTA_KEYBIND_MENU_ABILITIES" and\
