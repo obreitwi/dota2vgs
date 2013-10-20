@@ -84,6 +84,7 @@ class Composer(object):
         self.check_layout_names()
         self._determine_used_keys()
         self.key_stateful = set([])
+        self.duplicates = {}
 
         if ignore_keys is not None:
             self.used_keys -= set(ignore_keys)
@@ -109,8 +110,8 @@ class Composer(object):
             self.write_script_file(output_file)
 
         if not self.silent:
-            log.info("Please go to the Dota 2 options menu and delete the bindings "
-                    "to the following keys: {}".format(self.used_keys))
+            log.info("Please go to the Dota 2 options menu and delete the "
+                    "bindings to the following keys: {}".format(self.used_keys))
 
 
     def add_alias(self, name, type_=Alias):
@@ -272,7 +273,7 @@ class Composer(object):
         set_hotkeys = set(hotkeys)
 
         if len(hotkeys) != len(set_hotkeys):
-            duplicate_hotkeys = []
+            duplicate_hotkeys = self.duplicates.setdefault(dct["name"], [])
             for k in set_hotkeys:
                 if hotkeys.count(k) > 1:
                     duplicate_hotkeys.append(k)
