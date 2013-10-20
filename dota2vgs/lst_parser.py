@@ -123,10 +123,33 @@ class LST_Hotkey_Parser(LST_Parser):
                 if len(key) == 1:
                     key = key.lower()
 
+                if not self.check_validity(v):
+                    continue
+
                 if key in hotkeys:
                     mappings[key] = function
         except KeyError:
             raise LST_Error("No hotkey information found in specified .lst file!")
 
         return mappings
+
+
+    def check_validity(self, v):
+        """
+            Determine if the entry `v` is valid to be included in the functions.
+
+            Needed for some legacy stuff.
+        """
+        if v["Action"].split()[0] == "dota_ability_execute":
+            # we need to make sure to only cound PrimaryAction -> the rest is
+            # legacy
+            if v.get("Panel", "") == "#DOTA_KEYBIND_MENU_ABILITIES" and\
+                    v.get("SubPanel", "") == "#DOTA_KEYBIND_ABILITY_HERO":
+                return True
+            else:
+                return False
+
+        else:
+            # so far we have no other special rules, so the entry is valid
+            return True
 
