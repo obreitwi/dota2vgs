@@ -26,7 +26,8 @@ __all__ = ["Composer"]
 from .logcfg import log
 from .cfg_parser import BindParser
 from .lst_parser import LST_Hotkey_Parser
-from .commands import Bind, Alias, StatefulAlias, GroupWriter
+from .commands import Bind, Alias, StatefulAlias
+from .overlay import GroupWriter
 from .misc import load_data
 
 import string
@@ -102,7 +103,7 @@ class Composer(object):
         self._setup_aliases_existing_binds()
         self._setup_aliases_restore()
 
-        if self.layout.get("vgs_menu_enabled", False):
+        if self.layout.get("vgs_console_menu_enabled", False):
             self.setup_menu()
             self.has_menu = True
         else:

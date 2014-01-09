@@ -10,9 +10,6 @@ minimap_hero_size_vgs_mode: 1200
 minimap_hero_size_regular: 600    # this is the default value
                                   # I personally use 800
 
-# have a small menu display available macros in the top right corner
-vgs_menu_enabled: True # False to disable
-
 # the values should not need tweaking in most cases but are included for
 # completion
 # number of lines to draw to offset the menu

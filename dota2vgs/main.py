@@ -32,7 +32,7 @@ __doc__ =\
         {prgm}  sheet [-y <filename>] [-s <filename>]
 
     Modes:
-        Default :   Generate the vgs file.
+        (default) :   Generate the vgs file.
 
         sheet :     Make a cheat sheet of all the commands present in the layout
                     file.
@@ -71,9 +71,9 @@ __doc__ =\
 
 """.format(prgm=sys.argv[0])
 
-__version__ = "0.1.0"
+from . import SheetMaker, Composer
+from .version import __version__
 
-import dota2vgs
 import glob
 import os.path as osp
 import itertools
@@ -90,14 +90,14 @@ def open_files(filenames, mode="r"):
     return [open(fn, mode=mode) for fn in filenames]
 
 
-if __name__ == "__main__":
+def main_loop():
     args = docopt(__doc__, argv=sys.argv[1:], version=__version__)
 
     layout_file = open(args["--layout-file"], mode="r")
 
     if args["sheet"]:
         sheet_file = open(args["--sheet-file"], "w")
-        dota2vgs.SheetMaker(layout_file, sheet_file)
+        SheetMaker(layout_file, sheet_file)
 
         layout_file.close()
         sheet_file.close()
@@ -106,7 +106,7 @@ if __name__ == "__main__":
         cfg_files   = open_files(args["--cfg-file"], mode="r")
         lst_files   = open_files(args["--lst-file"], mode="r")
         output_file = open(args["--output-file"], mode="w")
-        dota2vgs.Composer(
+        Composer(
             cfg_files=cfg_files,
             lst_files=lst_files,
             layout_file=layout_file,
