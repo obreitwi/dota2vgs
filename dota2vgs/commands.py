@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-# Copyright (c) 2013 Oliver Breitwieser
+# Copyright (c) 2013-2014 Oliver Breitwieser
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -37,21 +37,36 @@ class ScriptCommand(object):
 
     # separator = "; "
     separator = ";"
-    to_escape = [ "\"" ]
+    # to_escape = [ "\"" ]
+    to_escape = []
 
     def __init__(self, key, lineending="\r\n"):
         self.LE = lineending
         self.key = key
         self.content = []
 
-    def add(self, command):
+    def add(self, command, escape_command=True):
         """
             Add another command to the function.
+
+            escape_command: Needs to be disabled when Aliases create aliases.
         """
+        if escape_command:
+            command = self._prepare_command(command)
+        self.content.append(command)
+
+    def prepend(self, command, escape_command=True):
+        """
+            Like `add` but prepends it to the commands.
+        """
+        if escape_command:
+            command = self._prepare_command(command)
+        self.content.insert(0, command)
+
+    def _prepare_command(self, command):
         for esc in self.to_escape:
             command = command.replace(esc, "\\" + esc)
-
-        self.content.append(command)
+        return command
 
     def get(self):
         """
@@ -103,11 +118,11 @@ class Alias(ScriptCommand):
             chunks.append(Alias(self.get_rep_name(i)))
 
             for j in range(c_start, c_stop):
-                chunks[-1].add(self.content[j])
+                chunks[-1].add(self.content[j], escape_command=False)
 
             # add the nameof the following alias
             if i < len(chunk_idx)-2:
-                chunks[-1].add(self.get_rep_name(i+1))
+                chunks[-1].add(self.get_rep_name(i+1), escape_command=False)
 
         return self.LE.join(c.get() for c in chunks)
 
@@ -121,6 +136,9 @@ class Alias(ScriptCommand):
 
     def make_chunks(self, content):
         """
+            Make a list containing where the content should
+            be chunked.
+
             Includes the last index
         """
         # determine the length of the command needed to call the next helper
@@ -172,10 +190,10 @@ class StatefulAlias(Alias):
         alias_off = Alias(alias_off_name)
 
         for c in self.content:
-            alias_on.add(c)
+            alias_on.add(c, escape_command=False)
             if self.contains_state(c):
                 alias_off.add(c.replace(self.token_state_on,
-                    self.token_state_off))
+                    self.token_state_off), escape_command=False)
 
         return self.LE.join([alias_on.get(), alias_off.get()])
 
@@ -195,6 +213,5 @@ class StatefulAlias(Alias):
 
     def contains_state_at_all(self):
         return self.check_content_for_state(self.content)
-
 
 

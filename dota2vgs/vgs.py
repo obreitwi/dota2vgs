@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-# Copyright (c) 2013 Oliver Breitwieser
+# Copyright (c) 2013-2014 Oliver Breitwieser
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ __all__ = ["Composer"]
 from .logcfg import log
 from .cfg_parser import BindParser
 from .lst_parser import LST_Hotkey_Parser
-from .commands import Bind, Alias, StatefulAlias
+from .commands import Bind, Alias, StatefulAlias, GroupWriter
 from .misc import load_data
 
 import string
@@ -101,6 +101,13 @@ class Composer(object):
                 self.get_aname_group("start")
         self._setup_aliases_existing_binds()
         self._setup_aliases_restore()
+
+        if self.layout.get("vgs_menu_enabled", False):
+            self.setup_menu()
+            self.has_menu = True
+        else:
+            self.has_menu = False
+
         self.layout["name"] = "start"
         self.setup_aliases_group(self.layout)
 
@@ -113,6 +120,22 @@ class Composer(object):
             log.info("Please go to the Dota 2 options menu and delete the "
                     "bindings to the following keys: {}".format(self.used_keys))
 
+    def setup_menu(self):
+        writer_kwargs = {}
+
+        def add_if_exists(layout_name, kwarg_name):
+            if layout_name in self.layout:
+                writer_kwargs[kwarg_name] = self.layout[layout_name]
+
+        add_if_exists("vgs_menu_lines_offset", "lines_offset")
+        add_if_exists("vgs_menu_show_lines", "lines_write_area")
+        add_if_exists("vgs_menu_notify_time", "notify_time")
+        add_if_exists("vgs_menu_hotkeys_min_width", "hotkey_min_width")
+
+        self.console_writer = GroupWriter(**writer_kwargs)
+        self.console_writer.add_stop_commands_to_alias(self.aliases["restore"])
+        self.console_writer.set_footer(["",
+            self.console_writer.format_hotkey(self.layout["hotkey_cancel"], "Cancel..")])
 
     def add_alias(self, name, type_=Alias):
         new_alias = type_(self.get_alias_name(name), lineending=self.LE)
@@ -268,6 +291,9 @@ class Composer(object):
 
             alias.add(self.get_cmd_alias(hotkey_name, group_name))
 
+        if self.has_menu:
+            self.console_writer.write_group_info_to_alias(dct, alias)
+
     def assure_no_duplicate_hotkeys(self, dct):
         hotkeys = self.get_concurrent_hotkeys(dct)
         set_hotkeys = set(hotkeys)
@@ -308,8 +334,14 @@ class Composer(object):
     def write_script_file(self, f):
         self.write_aliases(f)
         self.write_bindings(f)
+        if self.has_menu:
+            self.write_menu_prelude(f)
         f.write(self.restore_alias_name + self.LE)
         f.write("echo \"VGS successfully loaded!\"" + self.LE)
+
+    def write_menu_prelude(self, f):
+        for cmd in self.console_writer.start_commands():
+            f.write(cmd + self.LE)
 
     def write_bindings(self, file):
         for k in self.used_keys:
