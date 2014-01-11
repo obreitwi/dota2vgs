@@ -22,14 +22,30 @@
 # THE SOFTWARE.
 
 from __future__ import print_function
+
+import glob
+import os.path as osp
+import itertools
 import sys
+
+try:
+    from docopt import docopt
+except ImportError:
+    current_dir = osp.abspath(osp.dirname(sys.argv[0]))
+    sys.path.append(osp.join(current_dir, "dependencies"))
+    from docopt import docopt
+
+
+from . import SheetMaker, Composer, AutohotkeyWriter
+from .version import __version__
 
 __doc__ =\
 """
     Usage:
-        {prgm}  [-c <filename>]... [-l <filename>]...
+        {prgm}  vgs [-c <filename>]... [-l <filename>]...
                 [-y <filename>] [-o <filename>]
-        {prgm}  sheet [-y <filename>] [-s <filename>]
+        {prgm}  sheet [-y <filename>] [-o <filename>]
+        {prgm}  overlay [-y <filename>] [-o <filename>]
 
     Modes:
         (default) :   Generate the vgs file.
@@ -57,11 +73,6 @@ __doc__ =\
 
         -o --output-file <filename>
             Specify output filename.
-            [default: vgs.cfg]
-
-        -s --sheet-file <filename>
-            When generating a cheat sheet, the filename to be used.
-            [default: sheet.txt]
 
         --usage
             Print usage only.
@@ -69,21 +80,8 @@ __doc__ =\
         -h --help
             Show this help message.
 
-""".format(prgm=sys.argv[0])
+""".format(prgm=osp.basename(sys.argv[0]))
 
-from . import SheetMaker, Composer
-from .version import __version__
-
-import glob
-import os.path as osp
-import itertools
-
-try:
-    from docopt import docopt
-except ImportError:
-    current_dir = osp.abspath(osp.dirname(sys.argv[0]))
-    sys.path.append(osp.join(current_dir, "dependencies"))
-    from docopt import docopt
 
 
 def open_files(filenames, mode="r"):
@@ -96,23 +94,42 @@ def main_loop():
     layout_file = open(args["--layout-file"], mode="r")
 
     if args["sheet"]:
-        sheet_file = open(args["--sheet-file"], "w")
+        sheet_filename = args["--output-file"]
+        if sheet_filename is None:
+            sheet_filename = "sheet.txt"
+
+        sheet_file = open(sheet_filename, "w")
         SheetMaker(layout_file, sheet_file)
 
-        layout_file.close()
         sheet_file.close()
 
-    else:
+    elif args["overlay"]:
+        overlay_filename = args["--output-file"]
+        if overlay_filename is None:
+            overlay_filename = "vgs_overlay.ahk"
+
+        overlay_file = open(overlay_filename, "w")
+
+        writer = AutohotkeyWriter()
+        writer.set_layout_from_file(layout_file)
+        writer.write(overlay_file)
+
+        overlay_file.close()
+
+    elif args["vgs"]:
         cfg_files   = open_files(args["--cfg-file"], mode="r")
         lst_files   = open_files(args["--lst-file"], mode="r")
-        output_file = open(args["--output-file"], mode="w")
+        output_filename = args["--output-file"]
+        if output_filename is None:
+            output_filename = "vgs.cfg"
+        output_file = open(output_filename, mode="w")
         Composer(
             cfg_files=cfg_files,
             lst_files=lst_files,
             layout_file=layout_file,
             output_file=output_file)
 
-        for f in itertools.chain(cfg_files, lst_files,
-                [layout_file, output_file]):
+        for f in itertools.chain(cfg_files, lst_files, [output_file]):
             f.close()
+    layout_file.close()
 

@@ -53,8 +53,6 @@ class SheetMaker(object):
         self.write_prelude(layout)
         self.handle_group(layout, tuple())
 
-
-
     def write_prelude(self, layout):
         self.write_to_file("Hotkey (start): {}".format(layout["hotkey"]))
         self.write_to_file("Hotkey (stop):  {}".format(layout["hotkey_cancel"]))
