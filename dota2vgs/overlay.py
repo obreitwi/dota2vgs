@@ -227,8 +227,10 @@ class AutohotkeyWriter(object):
         self.all_hotkeys = self.gather_hotkeys(self.layout)
 
         self.code = []
+        self.code.append("#SingleInstance force")
 
         self.code.append(self.get_call_sub(self.sub_names["reset"]))
+        self.code.append("Return")
         self.code.append("")
 
         groups = [self.layout]
@@ -328,6 +330,10 @@ class AutohotkeyWriter(object):
         for phr in group.get("phrases", []):
             lines.append("{key} ==> {name}".format(key=phr["hotkey"],
                 name=self.beautify(phr["name"])))
+
+        lines.append("")
+        lines.append("{key} ==> (Cancel hotkeys)".format(
+            key=self.layout["hotkey_cancel"]))
 
         return lines
 
