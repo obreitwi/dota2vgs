@@ -203,9 +203,14 @@ class AutohotkeyWriter(object):
     xpos = 0
     ypos = 0
 
+    hotkey_toggle = "^F12"
+
     sub_names = {
             "hide" : "HideProgress",
             "reset" : "ResetHotkeys",
+            "init" : "Initialize",
+            "empty" : "Empty",
+            "toggle": "VGS_Toggle"
         }
 
     def __init__(self):
@@ -228,7 +233,9 @@ class AutohotkeyWriter(object):
 
         self.code = []
         self.code.append("#SingleInstance force")
+        self.code.append("#IfWinActive, DOTA 2")
 
+        self.code.append(self.get_call_sub(self.sub_names["init"]))
         self.code.append(self.get_call_sub(self.sub_names["reset"]))
         self.code.append("Return")
         self.code.append("")
@@ -248,9 +255,11 @@ class AutohotkeyWriter(object):
         self.code.append("")
         self.code.extend(self.get_subroutine_empty())
         self.code.append("")
+        self.code.extend(self.get_subroutine_init())
+        self.code.append("")
+        self.code.extend(self.get_subroutine_toggle())
+        self.code.append("")
 
-        for k in self.all_hotkeys:
-            self.code.append(self.get_hotkey(k, "Empty"))
         self.code.append("")
         self.code.append("")
 
@@ -261,6 +270,10 @@ class AutohotkeyWriter(object):
 
     def gather_hotkeys(self, group):
         hotkeys = set()
+
+        for hk in ("hotkey", "hotkey_cancel"):
+            if hk in group:
+                hotkeys.add(group[hk])
 
         for phr in group.get("phrases", []):
             hotkeys.add(phr["hotkey"])
@@ -345,7 +358,7 @@ class AutohotkeyWriter(object):
 
         # disable all hotkeys not in this group except for the global cancel
         code = map(lambda k: self.get_hotkey(k,
-            hotkeys_to_subnames.get(k, "Empty")),
+            hotkeys_to_subnames.get(k, self.sub_names["empty"])),
             list(self.all_hotkeys - set(hotkeys_phrases)))
 
         # all phrase hotkeys reset the overlay (also the cancel hotkey does)
@@ -368,6 +381,43 @@ class AutohotkeyWriter(object):
                 "Return",
             ]
 
+    def get_subroutine_init(self):
+        code = ["{}:".format(self.sub_names["init"])]
+
+        for k in self.all_hotkeys:
+            code.append(self.get_hotkey(k, self.sub_names["empty"]))
+
+        code.append("MsgBox, , VGS Overlay, VGS Overlay enabled`, "
+                "please use CTRL-F12 to enable/disable the overlay.")
+
+        code.append(self.get_hotkey(self.hotkey_toggle,
+            self.sub_names["toggle"]))
+
+        code.append("vgs_overlay_enabled := true")
+
+        code.append("Return")
+        return code
+
+    def get_subroutine_toggle(self):
+        code = [
+                "{}:".format(self.sub_names["toggle"]),
+                "If (vgs_overlay_enabled)",
+                "{",
+                "vgs_overlay_enabled := false",
+            ]
+        for k in self.all_hotkeys:
+            code.append(self.get_hotkey(k, self.sub_names["empty"]))
+
+        code.extend([
+                "}",
+                "else {",
+                self.get_call_sub(self.sub_names["reset"]),
+                "vgs_overlay_enabled := true",
+                "}",
+            ])
+        code.append("Return")
+        return code
+
     def get_subroutine_reset(self):
         code = [
                 "{}:".format(self.sub_names["reset"]),
@@ -375,7 +425,7 @@ class AutohotkeyWriter(object):
             ]
 
         for k in self.all_hotkeys - set(self.layout["hotkey"]):
-            code.append(self.get_hotkey(k, "Empty"))
+            code.append(self.get_hotkey(k, self.sub_names["empty"]))
 
         code.append(self.get_hotkey(self.layout["hotkey"],
             self.get_group_subroutine_name(self.root_group)))
@@ -385,8 +435,9 @@ class AutohotkeyWriter(object):
         return code
 
     def get_subroutine_empty(self):
-        return ["Empty:", "Return"]
+        return ["{}:".format(self.sub_names["empty"]), "Return"]
 
     def get_call_sub(self, subname):
         return "Gosub, {}".format(subname)
+
 
