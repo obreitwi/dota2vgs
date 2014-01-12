@@ -332,7 +332,7 @@ class AutohotkeyWriter(object):
                 self.beautify(group["name"]) + ":",
                 "",
             ]
-        for grp in group.get("groups", []):
+        for grp in sorted(group.get("groups", []), key=lambda x: x["name"]):
             lines.append("{key} ==> {name}".format(key=grp["hotkey"],
                 name=self.beautify(grp["name"])))
 
@@ -340,7 +340,7 @@ class AutohotkeyWriter(object):
                 and len(group.get("phrases", [])) > 0:
             lines.append("")
 
-        for phr in group.get("phrases", []):
+        for phr in sorted(group.get("phrases", []), key=lambda x: x["name"]):
             lines.append("{key} ==> {name}".format(key=phr["hotkey"],
                 name=self.beautify(phr["name"])))
 
@@ -387,8 +387,10 @@ class AutohotkeyWriter(object):
         for k in self.all_hotkeys:
             code.append(self.get_hotkey(k, self.sub_names["empty"]))
 
-        code.append("MsgBox, , VGS Overlay, VGS Overlay enabled`, "
-                "please use CTRL-F12 to enable/disable the overlay.")
+        code.append("MsgBox, , Dota 2 VGS Overlay, VGS Overlay for Dota 2 "
+                "enabled`, please use CTRL-F12 to disable/enable the overlay."
+                "`n`nNote that you need to have this script running whenever "
+                "you want to have the overlay enabled.")
 
         code.append(self.get_hotkey(self.hotkey_toggle,
             self.sub_names["toggle"]))

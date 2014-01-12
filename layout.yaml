@@ -10,16 +10,6 @@ minimap_hero_size_vgs_mode: 1200
 minimap_hero_size_regular: 600    # this is the default value
                                   # I personally use 800
 
-# the values should not need tweaking in most cases but are included for
-# completion
-# number of lines to draw to offset the menu
-vgs_menu_lines_offset: 6
-# if not everything is shown in the menu you need to increase this value
-# it governs how many lines are drawn (excluding offset)
-vgs_menu_show_lines: 18
-vgs_menu_notify_time: 30 # how long does the menu stay visible when no other input
-                         # is triggered (almost always irrelevant)
-
 # groups need a `hotkey` and either another `groups` or `phrases` attribute
 #
 # names should not contain spaces and only letters/digits and underscores
@@ -165,7 +155,7 @@ groups:
         hotkey: d
 
 
-  - name:    Devices_aka_Items
+  - name:    Items_aka_Devices
     hotkey:  d
     phrases:
       - id: 3
