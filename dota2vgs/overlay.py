@@ -223,6 +223,8 @@ class AutohotkeyWriter(object):
 
     def set_layout(self, layout):
         layout["name"] = self.root_group
+        self.xpos = layout.get("overlay_xpos", 0)
+        self.ypos = layout.get("overlay_ypos", 0)
         self.layout = layout
 
     def set_layout_from_file(self, layout_file):
@@ -387,8 +389,9 @@ class AutohotkeyWriter(object):
         for k in self.all_hotkeys:
             code.append(self.get_hotkey(k, self.sub_names["empty"]))
 
-        code.append("MsgBox, , Dota 2 VGS Overlay, VGS Overlay for Dota 2 "
-                "enabled`, please use CTRL-F12 to disable/enable the overlay."
+        code.append("TrayTip, Dota 2 VGS Overlay, VGS Overlay for Dota 2 "
+                "enabled`, please use CTRL-F12 to disable/enable the overlay "
+                "when in Dota 2."
                 "`n`nNote that you need to have this script running whenever "
                 "you want to have the overlay enabled.")
 
@@ -406,6 +409,7 @@ class AutohotkeyWriter(object):
                 "If (vgs_overlay_enabled)",
                 "{",
                 "vgs_overlay_enabled := false",
+                "TrayTip, Dota 2 VGS Overlay, VGS Overlay disabled, 10",
             ]
         for k in self.all_hotkeys:
             code.append(self.get_hotkey(k, self.sub_names["empty"]))
@@ -415,6 +419,7 @@ class AutohotkeyWriter(object):
                 "else {",
                 self.get_call_sub(self.sub_names["reset"]),
                 "vgs_overlay_enabled := true",
+                "TrayTip, Dota 2 VGS Overlay, VGS Overlay enabled, 10",
                 "}",
             ])
         code.append("Return")

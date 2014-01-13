@@ -10,6 +10,11 @@ minimap_hero_size_vgs_mode: 1200
 minimap_hero_size_regular: 600    # this is the default value
                                   # I personally use 800
 
+# overlay position (you can specify alternative x- and y-coordinates for the top
+# left corner of the overlay window)
+overlay_xpos: 0
+overlay_ypos: 0
+
 # groups need a `hotkey` and either another `groups` or `phrases` attribute
 #
 # names should not contain spaces and only letters/digits and underscores
