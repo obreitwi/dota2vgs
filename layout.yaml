@@ -10,10 +10,21 @@ minimap_hero_size_vgs_mode: 1200
 minimap_hero_size_regular: 600    # this is the default value
                                   # I personally use 800
 
-# overlay position (you can specify alternative x- and y-coordinates for the top
-# left corner of the overlay window)
-overlay_xpos: 0
-overlay_ypos: 0
+overlay:
+  # overlay position (you can specify alternative x- and y-coordinates for the top
+  # left corner of the overlay window)
+  xpos: 0
+  ypos: 0
+  font_name: "Courier New"
+  font_size: 10
+
+  # automatically place the overlay next to the minimap
+  # NOTE: if this is true, xpos and ypos are calculated automatically
+  place_left_of_minimap: true
+
+  # normalized horizontal space the minimap takes up
+  minimap_x_ratio: 0.172
+
 
 # groups need a `hotkey` and either another `groups` or `phrases` attribute
 #

@@ -194,16 +194,19 @@ class AutohotkeyWriter(object):
         Writer that generates an Autohotkey script that will act as overlay.
     """
 
-    window_title = "d2vgs_overlay"
-    root_group = "VGS"
-    font_size = 10
-    # font_name = "Arial"
-    font_name = "Courier New"
-    hide_delay = 30000
-    xpos = 0
-    ypos = 0
+    default_config = {
+            "root_group" : "VGS",
+            "font_size" : 10,
+            "font_name" : "Courier New",
+            "hide_delay" : 30000,
+            "xpos" : 0,
+            "ypos" : 0,
 
-    hotkey_toggle = "^F12"
+            "place_left_of_minimap" : True,
+            "minimap_x_ratio" : 0.172,
+
+            "hotkey_toggle" : "^F12",
+        }
 
     sub_names = {
             "hide" : "HideProgress",
@@ -213,19 +216,40 @@ class AutohotkeyWriter(object):
             "toggle": "VGS_Toggle"
         }
 
+    window_names = {
+            "dota2" : "DOTA 2",
+            "overlay" : "d2vgs_overlay",
+            }
+
     def __init__(self):
         self.layout = None
         self.all_hotkeys = set()
         self.code = []
 
-    def popup_appearance(self):
-        return "b zh0 c0 fs{font_size} Hide ".format(font_size=self.font_size)
+    def get_popup_appearance(self):
+        return "b zh0 c0 fs{font_size} Hide ".format(
+                font_size=self.config["font_size"])
 
     def set_layout(self, layout):
-        layout["name"] = self.root_group
-        self.xpos = layout.get("overlay_xpos", 0)
-        self.ypos = layout.get("overlay_ypos", 0)
+        layout.setdefault("overlay", {})
+
+        # backwards compatability
+        if "overlay_xpos" in layout:
+            layout["overlay"]["xpos"] = layout["overlay_xpos"]
+
+        if "overlay_ypos" in layout:
+            layout["overlay"]["ypos"] = layout["overlay_ypos"]
+
+        self.config = self.setup_config(layout["overlay"])
+
+        layout["name"] = self.config["root_group"]
+
         self.layout = layout
+
+    def setup_config(self, cfg):
+        config = copy.deepcopy(self.default_config)
+        config.update(cfg)
+        return config
 
     def set_layout_from_file(self, layout_file):
         self.set_layout(load_data(layout_file))
@@ -235,7 +259,7 @@ class AutohotkeyWriter(object):
 
         self.code = []
         self.code.append("#SingleInstance force")
-        self.code.append("#IfWinActive, DOTA 2")
+        self.code.append("#IfWinActive, {}".format(self.window_names["dota2"]))
 
         self.code.append(self.get_call_sub(self.sub_names["init"]))
         self.code.append(self.get_call_sub(self.sub_names["reset"]))
@@ -288,17 +312,34 @@ class AutohotkeyWriter(object):
 
     def get_progress_popup(self, lines):
         code = ["Progress, {fmt}, {lines}, , {title}, {font_name}".format(
-            fmt=self.popup_appearance(),
+            fmt=self.get_popup_appearance(),
             lines="`n".join(lines),
-            title=self.window_title,
-            font_name=self.font_name)]
+            title=self.window_names["overlay"],
+            font_name=self.config["font_name"])]
         code.append(self.get_progress_show())
-        code.append(self.get_move_command())
+        code.extend(self.get_move_command())
         return code
 
     def get_move_command(self):
-        return "WinMove, {title}, , {xpos}, {ypos}".format(
-                title=self.window_title, xpos=self.xpos, ypos=self.ypos)
+        if self.config["place_left_of_minimap"]:
+            code = [
+                    "WinGetPos, dota2_X, dota2_Y, dota2_W, dota2_H, {title}"\
+                            .format(title=self.window_names["dota2"]),
+                    "WinGetPos, vgs_overlay_X, vgs_overlay_Y, vgs_overlay_W, "
+                    "vgs_overlay_H, {title}".format(
+                        title=self.window_names["overlay"]),
+                    "target_X := {factor} * dota2_W + dota2_X".format(
+                        factor=self.config["minimap_x_ratio"]),
+                    "target_Y := dota2_Y + dota2_H - vgs_overlay_H",
+                    "WinMove, {title}, , %target_X%, %target_Y%".format(
+                        title=self.window_names["overlay"])
+                ]
+            return code
+
+        else:
+            return ["WinMove, {title}, , {xpos}, {ypos}".format(
+                title=self.window_names["overlay"],
+                xpos=self.config["xpos"], ypos=self.config["ypos"])]
 
     def get_progress_show(self):
         return "Progress, Show"
@@ -310,7 +351,8 @@ class AutohotkeyWriter(object):
         return "SetTimer, {name}, {delay}".format(name=name, delay=delay)
 
     def get_hide_timer(self):
-        return self.get_timer(self.sub_names["hide"], delay=self.hide_delay)
+        return self.get_timer(self.sub_names["hide"],
+                delay=self.config["hide_delay"])
 
     def get_group_subroutine(self, group):
         lines = self.get_group_displaytext(group)
@@ -395,7 +437,7 @@ class AutohotkeyWriter(object):
                 "`n`nNote that you need to have this script running whenever "
                 "you want to have the overlay enabled.")
 
-        code.append(self.get_hotkey(self.hotkey_toggle,
+        code.append(self.get_hotkey(self.config["hotkey_toggle"],
             self.sub_names["toggle"]))
 
         code.append("vgs_overlay_enabled := true")
@@ -435,7 +477,7 @@ class AutohotkeyWriter(object):
             code.append(self.get_hotkey(k, self.sub_names["empty"]))
 
         code.append(self.get_hotkey(self.layout["hotkey"],
-            self.get_group_subroutine_name(self.root_group)))
+            self.get_group_subroutine_name(self.config["root_group"])))
 
         code.append("Return")
 
