@@ -206,7 +206,7 @@ class AutohotkeyWriter(object):
             "minimap_x_ratio" : 0.172,
 
             "hotkey_toggle" : "^F12",
-            "hotkey_sync" : "Esc",
+            "hotkey_reset" : "Esc",
         }
 
     sub_names = {
@@ -266,6 +266,9 @@ class AutohotkeyWriter(object):
                 "#NoEnv",
                 "SetBatchLines -1",
                 "ListLines Off",
+                # hotkey that resets everything
+                self.get_hotkey(self.config["hotkey_reset"],
+                    self.sub_names["reset"])
             ])
 
         self.code.append(self.get_call_sub(self.sub_names["init"]))

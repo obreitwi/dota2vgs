@@ -18,6 +18,9 @@ overlay:
   font_name: "Courier New"
   font_size: 10
 
+  hotkey_toggle: ^F12
+  hotkey_reset: Escape
+
   # automatically place the overlay next to the minimap
   # NOTE: if this is true, xpos and ypos are calculated automatically
   place_left_of_minimap: true
