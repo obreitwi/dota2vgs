@@ -206,6 +206,7 @@ class AutohotkeyWriter(object):
             "minimap_x_ratio" : 0.172,
 
             "hotkey_toggle" : "^F12",
+            "hotkey_sync" : "Esc",
         }
 
     sub_names = {
@@ -260,6 +261,12 @@ class AutohotkeyWriter(object):
         self.code = []
         self.code.append("#SingleInstance force")
         self.code.append("#IfWinActive, {}".format(self.window_names["dota2"]))
+        # optimizations
+        self.code.extend([
+                "#NoEnv",
+                "SetBatchLines -1",
+                "ListLines Off",
+            ])
 
         self.code.append(self.get_call_sub(self.sub_names["init"]))
         self.code.append(self.get_call_sub(self.sub_names["reset"]))
